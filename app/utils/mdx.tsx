@@ -9,16 +9,14 @@ import {
   downloadMdxFileOrDirectory,
 } from '~/utils/github.server'
 import {AnchorOrLink, getDisplayUrl, getUrl, typedBoolean} from '~/utils/misc'
-import {redisCache} from './redis.server'
 import type {Timings} from './metrics.server'
-import {cachified} from './cache.server'
+// import {cachified} from './cache.server'
 import {getSocialMetas} from './seo'
 import {
   getImageBuilder,
   getImgProps,
   getSocialImageWithPreTitle,
 } from '~/images'
-import {Themed} from './theme-provider'
 import {markdownToHtmlUnwrapped, stripHtml} from './markdown.server'
 
 type CachifiedOptions = {
@@ -321,23 +319,32 @@ async function getDataUrlForImage(imageUrl: string) {
 }
 
 async function getBlogMdxListItems(options: CachifiedOptions) {
-  return cachified({
-    cache: redisCache,
-    maxAge: defaultMaxAge,
-    ...options,
-    key: 'blog:mdx-list-items',
-    getFreshValue: async () => {
-      let pages = await getMdxPagesInDirectory('blog', options)
+  // return cachified({
+  //   cache: redisCache,
+  //   maxAge: defaultMaxAge,
+  //   ...options,
+  //   key: 'blog:mdx-list-items',
+  //   getFreshValue: async () => {
+  //     let pages = await getMdxPagesInDirectory('blog', options)
+  //
+  //     pages = pages.sort((a, z) => {
+  //       const aTime = new Date(a.frontmatter.date ?? '').getTime()
+  //       const zTime = new Date(z.frontmatter.date ?? '').getTime()
+  //       return aTime > zTime ? -1 : aTime === zTime ? 0 : 1
+  //     })
+  //
+  //     return pages.map(mapFromMdxPageToMdxListItem)
+  //   },
+  // })
+  let pages = await getMdxPagesInDirectory('blog', options)
 
-      pages = pages.sort((a, z) => {
-        const aTime = new Date(a.frontmatter.date ?? '').getTime()
-        const zTime = new Date(z.frontmatter.date ?? '').getTime()
-        return aTime > zTime ? -1 : aTime === zTime ? 0 : 1
-      })
-
-      return pages.map(mapFromMdxPageToMdxListItem)
-    },
+  pages = pages.sort((a, z) => {
+    const aTime = new Date(a.frontmatter.date ?? '').getTime()
+    const zTime = new Date(z.frontmatter.date ?? '').getTime()
+    return aTime > zTime ? -1 : aTime === zTime ? 0 : 1
   })
+
+  return pages.map(mapFromMdxPageToMdxListItem)
 }
 
 function mdxPageMeta({
@@ -397,7 +404,6 @@ function mapFromMdxPageToMdxListItem(page: MdxPage): MdxListItem {
 
 const mdxComponents = {
   a: AnchorOrLink,
-  Themed,
   ThemedBlogImage,
   BlogImage,
 }
