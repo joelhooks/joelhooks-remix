@@ -1,10 +1,21 @@
-node_modules
+.vscode/
+.DS_Store
+node_modules/
 
-.cache
-.vercel
-.output
+/.cache
+/build
+/server-build
+/public/build
+/coverage
+tsconfig.tsbuildinfo
+
+/app/styles/**/*.css
+other/postcss.ignored
+
+/cypress/videos
+/cypress/screenshots
+*.local.*
 
 .env
-
-public/build
-api/build
+.env.production
+.envrc

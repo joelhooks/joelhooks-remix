@@ -16,14 +16,14 @@ type LoaderData = CatchData & {
   page: MdxPage
 }
 
-export const loader: KCDLoader<{ slug: string }> = async ({request, params}) => {
+export const loader: KCDLoader<{slug: string}> = async ({request, params}) => {
   const timings: Timings = {}
   const page = await getMdxPage(
-      {
-        contentDir: 'blog',
-        slug: params.slug,
-      },
-      {request, timings},
+    {
+      contentDir: 'blog',
+      slug: params.slug,
+    },
+    {request, timings},
   )
 
   console.log(page)
@@ -41,8 +41,8 @@ export default function Blog() {
 
   console.log(params, data)
   return (
-      <div>
-        <Component/>
-      </div>
+    <div>
+      <Component />
+    </div>
   )
 }

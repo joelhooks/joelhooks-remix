@@ -18,6 +18,13 @@ import {
   getSocialImageWithPreTitle,
 } from '~/images'
 import {markdownToHtmlUnwrapped, stripHtml} from './markdown.server'
+import Title from '~/components/mdx/Title'
+import Subtitle from '~/components/mdx/Subtitle'
+import Paragraph from '~/components/mdx/Paragraph'
+import {preToCodeBlock} from 'mdx-utils'
+import Code from '~/components/mdx/Code'
+import ResponsiveEmbed from 'react-responsive-embed'
+import {TwitterTweetEmbed} from 'react-twitter-embed'
 
 type CachifiedOptions = {
   forceFresh?: boolean | string
@@ -403,9 +410,21 @@ function mapFromMdxPageToMdxListItem(page: MdxPage): MdxListItem {
 }
 
 const mdxComponents = {
-  a: AnchorOrLink,
-  ThemedBlogImage,
-  BlogImage,
+  h1: (props) => <Title {...props} />,
+  h2: (props) => <Subtitle {...props} />,
+  p: (props) => <Paragraph {...props} />,
+  pre: (preProps) => {
+    const props = preToCodeBlock(preProps)
+    // if there's a codeString and some props, we passed the test
+    if (props) {
+      return <Code {...props} />
+    } else {
+      // it's possible to have a pre without a code in it
+      return <pre {...preProps} />
+    }
+  },
+  ResponsiveEmbed,
+  TwitterTweetEmbed,
 }
 
 /**
@@ -449,23 +468,6 @@ function BlogImage({
         transformations: {background: 'rgb:e6e9ee'},
       })}
       {...imgProps}
-    />
-  )
-}
-
-function ThemedBlogImage({
-  darkCloudinaryId,
-  lightCloudinaryId,
-  imgProps,
-}: {
-  darkCloudinaryId: string
-  lightCloudinaryId: string
-  imgProps: JSX.IntrinsicElements['img']
-}) {
-  return (
-    <Themed
-      light={<BlogImage cloudinaryId={lightCloudinaryId} imgProps={imgProps} />}
-      dark={<BlogImage cloudinaryId={darkCloudinaryId} imgProps={imgProps} />}
     />
   )
 }
