@@ -71,6 +71,5 @@
     "trailingComma": "all",
     "bracketSpacing": false,
     "jsxBracketSameLine": false
-  },
-  "sideEffects": false
+  }
 }
