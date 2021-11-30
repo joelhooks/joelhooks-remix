@@ -6,7 +6,7 @@ let secret = 'not-at-all-secret'
 if (process.env.MAGIC_LINK_SECRET) {
   secret = process.env.MAGIC_LINK_SECRET
 } else if (process.env.NODE_ENV === 'production') {
-  throw new Error('Must set MAGIC_LINK_SECRET')
+  // throw new Error('Must set MAGIC_LINK_SECRET')
 }
 
 const ENCRYPTION_KEY = crypto.scryptSync(secret, 'salt', 32)

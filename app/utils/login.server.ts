@@ -7,7 +7,7 @@ const loginInfoStorage = createCookieSessionStorage({
   cookie: {
     name: 'KCD_login',
     secure: true,
-    secrets: [getRequiredServerEnvVar('SESSION_SECRET')],
+    secrets: ['notyet'],
     sameSite: 'lax',
     path: '/',
     maxAge: linkExpirationTime / 1000,

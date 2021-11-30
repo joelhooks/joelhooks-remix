@@ -71,5 +71,14 @@
     "trailingComma": "all",
     "bracketSpacing": false,
     "jsxBracketSameLine": false
-  }
+  },
+  "eslintIgnore": [
+    "node_modules",
+    "coverage",
+    "server-build",
+    "build",
+    "public/build",
+    "*.ignored/",
+    "*.ignored.*"
+  ]
 }
