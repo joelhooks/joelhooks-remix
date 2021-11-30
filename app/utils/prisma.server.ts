@@ -31,7 +31,7 @@ const PRIMARY_REGION = isLocalHost
   ? null
   : getRequiredServerEnvVar('PRIMARY_REGION')
 
-const FLY_REGION = isLocalHost ? null : getRequiredServerEnvVar('FLY_REGION')
+const FLY_REGION = isLocalHost ? null : null
 const isPrimaryRegion = PRIMARY_REGION === FLY_REGION
 if (!isLocalHost) {
   regionalDB.host = `${FLY_REGION}.${regionalDB.host}`
