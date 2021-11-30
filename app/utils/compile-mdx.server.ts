@@ -184,6 +184,7 @@ async function compileMdx<FrontmatterType extends Record<string, unknown>>(
   const {default: gfm} = await import('remark-gfm')
 
   const indexRegex = new RegExp(`${slug}\\/index.mdx?$`)
+
   const indexFile = githubFiles.find(({path}) => indexRegex.test(path))
   if (!indexFile) return null
 

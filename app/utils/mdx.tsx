@@ -9,8 +9,9 @@ import {
   downloadMdxFileOrDirectory,
 } from '~/utils/github.server'
 import {AnchorOrLink, getDisplayUrl, getUrl, typedBoolean} from '~/utils/misc'
+import {redisCache} from './redis.server'
 import type {Timings} from './metrics.server'
-// import {cachified} from './cache.server'
+import {cachified} from './cache.server'
 import {getSocialMetas} from './seo'
 import {
   getImageBuilder,
@@ -54,24 +55,37 @@ async function getMdxPage(
 ): Promise<MdxPage | null> {
   const key = getCompiledKey(contentDir, slug)
 
-  const getPage = async () => {
-    const pageFiles = await downloadMdxFilesCached(contentDir, slug, options)
-    const compiledPage = await compileMdxCached({
-      contentDir,
-      slug,
-      ...pageFiles,
-      options,
-    }).catch((err) => {
-      console.error(`Failed to get a fresh value for mdx:`, {
+  const page = await cachified({
+    cache: redisCache,
+    maxAge: defaultMaxAge,
+    ...options,
+    // reusing the same key as compiledMdxCached because we just return that
+    // exact same value. Cachifying this allows us to skip getting the cached files
+    key,
+    checkValue: checkCompiledValue,
+    getFreshValue: async () => {
+      const pageFiles = await downloadMdxFilesCached(contentDir, slug, options)
+
+      const compiledPage = await compileMdxCached({
         contentDir,
         slug,
+        ...pageFiles,
+        options,
+      }).catch((err) => {
+        console.error(`Failed to get a fresh value for mdx:`, {
+          contentDir,
+          slug,
+        })
+        return Promise.reject(err)
       })
-      return Promise.reject(err)
-    })
-    return compiledPage
+      return compiledPage
+    },
+  })
+  if (!page) {
+    // if there's no page, let's remove it from the cache
+    void redisCache.del(key)
   }
-
-  return await getPage()
+  return page
 }
 
 async function getMdxPagesInDirectory(
@@ -101,33 +115,27 @@ async function getMdxPagesInDirectory(
 const getDirListKey = (contentDir: string) => `${contentDir}:dir-list`
 
 async function getMdxDirList(contentDir: string, options?: CachifiedOptions) {
-  // return cachified({
-  //   cache: redisCache,
-  //   maxAge: defaultMaxAge,
-  //   ...options,
-  //   key: getDirListKey(contentDir),
-  //   checkValue: (value: unknown) => Array.isArray(value),
-  //   getFreshValue: async () => {
-  //     const fullContentDirPath = `content/${contentDir}`
-  //     const dirList = (await downloadDirList(fullContentDirPath))
-  //         .map(({name, path}) => ({
-  //           name,
-  //           slug: path
-  //               .replace(`${fullContentDirPath}/`, '')
-  //               .replace(/\.mdx$/, ''),
-  //         }))
-  //         .filter(({name}) => name !== 'README.md')
-  //     return dirList
-  //   },
-  // })
-  const fullContentDirPath = `content/${contentDir}`
-  const dirList = (await downloadDirList(fullContentDirPath))
-    .map(({name, path}) => ({
-      name,
-      slug: path.replace(`${fullContentDirPath}/`, '').replace(/\.mdx$/, ''),
-    }))
-    .filter(({name}) => name !== 'README.md')
-  return dirList
+  return cachified({
+    cache: redisCache,
+    maxAge: defaultMaxAge,
+    ...options,
+    key: getDirListKey(contentDir),
+    checkValue: (value: unknown) => Array.isArray(value),
+    getFreshValue: async () => {
+      const fullContentDirPath = `content/${contentDir}`
+      const dirList = (await downloadDirList(fullContentDirPath))
+        .map(({name, path}) => ({
+          name,
+          slug: path
+            .replace(`${fullContentDirPath}/`, '')
+            .replace(/\.mdx$/, ''),
+        }))
+        .filter(({name}) => name !== 'README.md')
+
+      consol.log({dirList})
+      return dirList
+    },
+  })
 }
 
 const getDownloadKey = (contentDir: string, slug: string) =>
@@ -138,39 +146,38 @@ async function downloadMdxFilesCached(
   slug: string,
   options: CachifiedOptions,
 ) {
-  // const key = getDownloadKey(contentDir, slug)
-  // const downloaded = await cachified({
-  //   cache: redisCache,
-  //   maxAge: defaultMaxAge,
-  //   ...options,
-  //   key,
-  //   checkValue: (value: unknown) => {
-  //     if (typeof value !== 'object') {
-  //       return `value is not an object`
-  //     }
-  //     if (value === null) {
-  //       return `value is null`
-  //     }
-  //
-  //     const download = value as Record<string, unknown>
-  //     if (!Array.isArray(download.files)) {
-  //       return `value.files is not an array`
-  //     }
-  //     if (typeof download.entry !== 'string') {
-  //       return `value.entry is not a string`
-  //     }
-  //
-  //     return true
-  //   },
-  //   getFreshValue: async () =>
-  //     downloadMdxFileOrDirectory(`${contentDir}/${slug}`),
-  // })
-  // // if there aren't any files, remove it from the cache
-  // if (!downloaded.files.length) {
-  //   void redisCache.del(key)
-  // }
-  console.log(`${contentDir}/${slug}`)
-  return await downloadMdxFileOrDirectory(`${contentDir}/${slug}`)
+  const key = getDownloadKey(contentDir, slug)
+  const downloaded = await cachified({
+    cache: redisCache,
+    maxAge: defaultMaxAge,
+    ...options,
+    key,
+    checkValue: (value: unknown) => {
+      if (typeof value !== 'object') {
+        return `value is not an object`
+      }
+      if (value === null) {
+        return `value is null`
+      }
+
+      const download = value as Record<string, unknown>
+      if (!Array.isArray(download.files)) {
+        return `value.files is not an array`
+      }
+      if (typeof download.entry !== 'string') {
+        return `value.entry is not a string`
+      }
+
+      return true
+    },
+    getFreshValue: async () =>
+      downloadMdxFileOrDirectory(`${contentDir}/${slug}`),
+  })
+  // if there aren't any files, remove it from the cache
+  if (!downloaded.files.length) {
+    void redisCache.del(key)
+  }
+  return downloaded
 }
 
 async function compileMdxCached({
@@ -186,102 +193,61 @@ async function compileMdxCached({
   files: Array<GitHubFile>
   options: CachifiedOptions
 }) {
-  // const key = getCompiledKey(contentDir, slug)
-  // const page = await cachified({
-  //   cache: redisCache,
-  //   maxAge: defaultMaxAge,
-  //   ...options,
-  //   key,
-  //   checkValue: checkCompiledValue,
-  //   getFreshValue: async () => {
-  //     const compiledPage = await compileMdx<MdxPage['frontmatter']>(slug, files)
-  //     if (compiledPage) {
-  //       if (
-  //         compiledPage.frontmatter.bannerCloudinaryId &&
-  //         !compiledPage.frontmatter.bannerBlurDataUrl
-  //       ) {
-  //         try {
-  //           compiledPage.frontmatter.bannerBlurDataUrl = await getBlurDataUrl(
-  //             compiledPage.frontmatter.bannerCloudinaryId,
-  //           )
-  //         } catch (error: unknown) {
-  //           console.error(
-  //             'oh no, there was an error getting the blur image data url',
-  //             error,
-  //           )
-  //         }
-  //       }
-  //       if (compiledPage.frontmatter.bannerCredit) {
-  //         const credit = await markdownToHtmlUnwrapped(
-  //           compiledPage.frontmatter.bannerCredit,
-  //         )
-  //         compiledPage.frontmatter.bannerCredit = credit
-  //         const noHtml = await stripHtml(credit)
-  //         if (!compiledPage.frontmatter.bannerAlt) {
-  //           compiledPage.frontmatter.bannerAlt = noHtml
-  //             .replace(/(photo|image)/i, '')
-  //             .trim()
-  //         }
-  //         if (!compiledPage.frontmatter.bannerTitle) {
-  //           compiledPage.frontmatter.bannerTitle = noHtml
-  //         }
-  //       }
-  //       return {
-  //         ...compiledPage,
-  //         slug,
-  //         editLink: `https://github.com/kentcdodds/kentcdodds.com/edit/main/${entry}`,
-  //       }
-  //     } else {
-  //       return null
-  //     }
-  //   },
-  // })
-  // // if there's no page, remove it from the cache
-  // if (!page) {
-  //   void redisCache.del(key)
-  // }
-  // return page
-
-  const compiledPage = await compileMdx<MdxPage['frontmatter']>(slug, files)
-  if (compiledPage) {
-    if (
-      compiledPage.frontmatter.bannerCloudinaryId &&
-      !compiledPage.frontmatter.bannerBlurDataUrl
-    ) {
-      try {
-        compiledPage.frontmatter.bannerBlurDataUrl = await getBlurDataUrl(
-          compiledPage.frontmatter.bannerCloudinaryId,
-        )
-      } catch (error: unknown) {
-        console.error(
-          'oh no, there was an error getting the blur image data url',
-          error,
-        )
+  const key = getCompiledKey(contentDir, slug)
+  const page = await cachified({
+    cache: redisCache,
+    maxAge: defaultMaxAge,
+    ...options,
+    key,
+    checkValue: checkCompiledValue,
+    getFreshValue: async () => {
+      const compiledPage = await compileMdx<MdxPage['frontmatter']>(slug, files)
+      if (compiledPage) {
+        if (
+          compiledPage.frontmatter.bannerCloudinaryId &&
+          !compiledPage.frontmatter.bannerBlurDataUrl
+        ) {
+          try {
+            compiledPage.frontmatter.bannerBlurDataUrl = await getBlurDataUrl(
+              compiledPage.frontmatter.bannerCloudinaryId,
+            )
+          } catch (error: unknown) {
+            console.error(
+              'oh no, there was an error getting the blur image data url',
+              error,
+            )
+          }
+        }
+        if (compiledPage.frontmatter.bannerCredit) {
+          const credit = await markdownToHtmlUnwrapped(
+            compiledPage.frontmatter.bannerCredit,
+          )
+          compiledPage.frontmatter.bannerCredit = credit
+          const noHtml = await stripHtml(credit)
+          if (!compiledPage.frontmatter.bannerAlt) {
+            compiledPage.frontmatter.bannerAlt = noHtml
+              .replace(/(photo|image)/i, '')
+              .trim()
+          }
+          if (!compiledPage.frontmatter.bannerTitle) {
+            compiledPage.frontmatter.bannerTitle = noHtml
+          }
+        }
+        return {
+          ...compiledPage,
+          slug,
+          editLink: `https://github.com/kentcdodds/kentcdodds.com/edit/main/${entry}`,
+        }
+      } else {
+        return null
       }
-    }
-    if (compiledPage.frontmatter.bannerCredit) {
-      const credit = await markdownToHtmlUnwrapped(
-        compiledPage.frontmatter.bannerCredit,
-      )
-      compiledPage.frontmatter.bannerCredit = credit
-      const noHtml = await stripHtml(credit)
-      if (!compiledPage.frontmatter.bannerAlt) {
-        compiledPage.frontmatter.bannerAlt = noHtml
-          .replace(/(photo|image)/i, '')
-          .trim()
-      }
-      if (!compiledPage.frontmatter.bannerTitle) {
-        compiledPage.frontmatter.bannerTitle = noHtml
-      }
-    }
-    return {
-      ...compiledPage,
-      slug,
-      editLink: `https://github.com/kentcdodds/kentcdodds.com/edit/main/${entry}`,
-    }
-  } else {
-    return null
+    },
+  })
+  // if there's no page, remove it from the cache
+  if (!page) {
+    void redisCache.del(key)
   }
+  return page
 }
 
 function getBannerAltProp(frontmatter: MdxPage['frontmatter']) {
@@ -326,32 +292,23 @@ async function getDataUrlForImage(imageUrl: string) {
 }
 
 async function getBlogMdxListItems(options: CachifiedOptions) {
-  // return cachified({
-  //   cache: redisCache,
-  //   maxAge: defaultMaxAge,
-  //   ...options,
-  //   key: 'blog:mdx-list-items',
-  //   getFreshValue: async () => {
-  //     let pages = await getMdxPagesInDirectory('blog', options)
-  //
-  //     pages = pages.sort((a, z) => {
-  //       const aTime = new Date(a.frontmatter.date ?? '').getTime()
-  //       const zTime = new Date(z.frontmatter.date ?? '').getTime()
-  //       return aTime > zTime ? -1 : aTime === zTime ? 0 : 1
-  //     })
-  //
-  //     return pages.map(mapFromMdxPageToMdxListItem)
-  //   },
-  // })
-  let pages = await getMdxPagesInDirectory('blog', options)
+  return cachified({
+    cache: redisCache,
+    maxAge: defaultMaxAge,
+    ...options,
+    key: 'blog:mdx-list-items',
+    getFreshValue: async () => {
+      let pages = await getMdxPagesInDirectory('blog', options)
 
-  pages = pages.sort((a, z) => {
-    const aTime = new Date(a.frontmatter.date ?? '').getTime()
-    const zTime = new Date(z.frontmatter.date ?? '').getTime()
-    return aTime > zTime ? -1 : aTime === zTime ? 0 : 1
+      pages = pages.sort((a, z) => {
+        const aTime = new Date(a.frontmatter.date ?? '').getTime()
+        const zTime = new Date(z.frontmatter.date ?? '').getTime()
+        return aTime > zTime ? -1 : aTime === zTime ? 0 : 1
+      })
+
+      return pages.map(mapFromMdxPageToMdxListItem)
+    },
   })
-
-  return pages.map(mapFromMdxPageToMdxListItem)
 }
 
 function mdxPageMeta({
