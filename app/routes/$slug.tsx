@@ -8,7 +8,7 @@ import type {
   MdxPage,
   Timings,
 } from '~/types'
-import {getMdxPage} from '~/utils/mdx'
+import {getMdxPage, useMdxComponent} from '~/utils/mdx'
 
 type CatchData = {}
 
@@ -16,25 +16,33 @@ type LoaderData = CatchData & {
   page: MdxPage
 }
 
-export const loader: KCDLoader<{slug: string}> = async ({request, params}) => {
+export const loader: KCDLoader<{ slug: string }> = async ({request, params}) => {
   const timings: Timings = {}
   const page = await getMdxPage(
-    {
-      contentDir: 'blog',
-      slug: params.slug,
-    },
-    {request, timings},
+      {
+        contentDir: 'blog',
+        slug: params.slug,
+      },
+      {request, timings},
   )
 
-  console.log('***', page)
+  console.log(page)
 
-  return json({butts: 666})
+  return json({page})
 }
 
 export default function Blog() {
   const data = useLoaderData<LoaderData>()
   const params = useParams()
 
+  const {code, frontmatter} = data.page
+
+  const Component = useMdxComponent(code)
+
   console.log(params, data)
-  return <div>{params.slug}</div>
+  return (
+      <div>
+        <Component/>
+      </div>
+  )
 }
