@@ -1,1 +1,1 @@
-// 1638339290824: /Users/joel/Code/joelhooks/joelhooks-remix/content/blog/tummler/index.mdx
+// 1638379772985: /Users/joel/Code/joelhooks/joelhooks-remix/content/.DS_Store

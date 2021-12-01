@@ -7,7 +7,6 @@ specifiers:
   '@kentcdodds/md-temp': ^1.1.0
   '@octokit/plugin-throttling': ^3.5.2
   '@octokit/rest': ^18.12.0
-  '@prisma/client': ^3.5.0
   '@remark-embedder/core': ^2.0.0
   '@remark-embedder/transformer-oembed': ^2.0.0
   '@remix-run/dev': ^1.0.6
@@ -56,7 +55,6 @@ specifiers:
   postcss-import: ^14.0.2
   prettier: ^2.5.0
   prism-react-renderer: ^1.2.1
-  prisma: ^3.5.0
   react: ^17.0.2
   react-dom: ^17.0.2
   react-responsive-embed: ^2.1.0
@@ -88,7 +86,6 @@ dependencies:
   '@kentcdodds/md-temp': 1.1.0
   '@octokit/plugin-throttling': 3.5.2
   '@octokit/rest': 18.12.0
-  '@prisma/client': 3.6.0_prisma@3.6.0
   '@remark-embedder/core': 2.0.0
   '@remark-embedder/transformer-oembed': 2.0.0_@remark-embedder+core@2.0.0
   '@remix-run/express': 1.0.6_react-dom@17.0.2+react@17.0.2
@@ -123,7 +120,6 @@ dependencies:
   postcss-import: 14.0.2_postcss@8.4.4
   prettier: 2.5.0
   prism-react-renderer: 1.2.1_react@17.0.2
-  prisma: 3.6.0
   react: 17.0.2
   react-dom: 17.0.2_react@17.0.2
   react-responsive-embed: 2.1.0_react@17.0.2
@@ -684,29 +680,6 @@ packages:
       debug: 4.3.3
     transitivePeerDependencies:
       - supports-color
-    dev: false
-
-  /@prisma/client/3.6.0_prisma@3.6.0:
-    resolution: {integrity: sha512-ycSGY9EZGROtje0iCNsgC5Zqi/ttX2sO7BNMYaLsUMiTlf3F69ZPH+08pRo0hrDfkZzyimXYqeXJlaoYDH1w7A==}
-    engines: {node: '>=12.6'}
-    requiresBuild: true
-    peerDependencies:
-      prisma: '*'
-    peerDependenciesMeta:
-      prisma:
-        optional: true
-    dependencies:
-      '@prisma/engines-version': 3.6.0-24.dc520b92b1ebb2d28dc3161f9f82e875bd35d727
-      prisma: 3.6.0
-    dev: false
-
-  /@prisma/engines-version/3.6.0-24.dc520b92b1ebb2d28dc3161f9f82e875bd35d727:
-    resolution: {integrity: sha512-vtoO2ys6mSfc8ONTWdcYztKN3GBU1tcKBj0aXObyjzSuGwHFcM/pEA0xF+n1W4/0TAJgfoPX2khNEit6g0jtNA==}
-    dev: false
-
-  /@prisma/engines/3.6.0-24.dc520b92b1ebb2d28dc3161f9f82e875bd35d727:
-    resolution: {integrity: sha512-dRClHS7DsTVchDKzeG72OaEyeDskCv91pnZ72Fftn0mp4BkUvX2LvWup65hCNzwwQm5IDd6A88APldKDnMiEMA==}
-    requiresBuild: true
     dev: false
 
   /@remark-embedder/core/2.0.0:
@@ -5951,15 +5924,6 @@ packages:
       react: '>=0.14.9'
     dependencies:
       react: 17.0.2
-    dev: false
-
-  /prisma/3.6.0:
-    resolution: {integrity: sha512-6SqgHS/5Rq6HtHjsWsTxlj+ySamGyCLBUQfotc2lStOjPv52IQuDVpp58GieNqc9VnfuFyHUvTZw7aQB+G2fvQ==}
-    engines: {node: '>=12.6'}
-    hasBin: true
-    requiresBuild: true
-    dependencies:
-      '@prisma/engines': 3.6.0-24.dc520b92b1ebb2d28dc3161f9f82e875bd35d727
     dev: false
 
   /promise-inflight/1.0.1:
