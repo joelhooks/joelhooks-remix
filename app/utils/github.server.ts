@@ -52,16 +52,12 @@ async function downloadMdxFileOrDirectory(
 ): Promise<{entry: string; files: Array<GitHubFile>}> {
   const mdxFileOrDirectory = `content/${relativeMdxFileOrDirectory}`
 
-  console.log({mdxFileOrDirectory})
-
   const parentDir = nodePath.dirname(mdxFileOrDirectory)
   const dirList = await downloadDirList(parentDir)
   const basename = nodePath.basename(mdxFileOrDirectory)
 
   const mdxFileWithoutExt = nodePath.parse(mdxFileOrDirectory).name
   const potentials = dirList.filter(({name}) => name.startsWith(basename))
-
-  console.log({potentials, mdxFileWithoutExt})
 
   const exactMatch = potentials.find(
     ({name}) => nodePath.parse(name).name === mdxFileWithoutExt,
@@ -74,8 +70,6 @@ async function downloadMdxFileOrDirectory(
   )
   let files: Array<GitHubFile> = []
   let entry = mdxFileOrDirectory
-
-  console.log({content})
 
   if (content) {
     // technically you can get the blog post by adding .mdx at the end... Weird

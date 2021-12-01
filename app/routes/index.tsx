@@ -3,6 +3,8 @@ import type {MetaFunction, LoaderFunction} from 'remix'
 import {useLoaderData, json, Link, useParams} from 'remix'
 import type {KCDLoader, MdxPage, Timings} from '~/types'
 import {getMdxPage, useMdxComponent} from '~/utils/mdx'
+import Layout from '~/components/Layout'
+import Container from '~/components/Container'
 
 type CatchData = {}
 
@@ -32,8 +34,10 @@ export default function Blog() {
   const Component = useMdxComponent(code)
 
   return (
-    <div className="flex flex-col w-full min-h-screen">
-      <Component />
-    </div>
+    <Layout>
+      <Container>
+        <Component />
+      </Container>
+    </Layout>
   )
 }

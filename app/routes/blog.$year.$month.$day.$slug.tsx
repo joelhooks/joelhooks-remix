@@ -37,7 +37,6 @@ export default function Blog() {
 
   const Component = useMdxComponent(code)
 
-  console.log(params, data)
   return (
     <div>
       <Component />

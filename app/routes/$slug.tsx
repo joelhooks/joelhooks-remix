@@ -1,3 +1,4 @@
+/** @jsx jsx */
 import * as React from 'react'
 import type {MetaFunction, LoaderFunction} from 'remix'
 import {useLoaderData, json, Link, useParams} from 'remix'
@@ -9,6 +10,10 @@ import type {
   Timings,
 } from '~/types'
 import {getMdxPage, useMdxComponent} from '~/utils/mdx'
+import {css, jsx} from '@emotion/react'
+import {bpMaxSM, bpMinMD, bpMinLG} from '~/lib/breakpoints'
+import Container from '~/components/Container'
+import Layout from '~/components/Layout'
 
 type CatchData = {}
 
@@ -37,10 +42,24 @@ export default function Blog() {
 
   const Component = useMdxComponent(code)
 
-  console.log(params, data)
   return (
-    <div>
-      <Component />
-    </div>
+    <Layout>
+      <article
+        css={css({
+          width: '100%',
+          display: 'flex',
+          '.gatsby-resp-image-link': {
+            margin: '0 -20px',
+            [bpMinMD]: {
+              margin: 0,
+            },
+          },
+        })}
+      >
+        <Container>
+          <Component />
+        </Container>
+      </article>
+    </Layout>
   )
 }
