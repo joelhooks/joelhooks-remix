@@ -40,10 +40,6 @@ WORKDIR /app/
 
 COPY --from=deps /app/node_modules /app/node_modules
 
-# schema doesn't change much so these will stay cached
-ADD prisma .
-RUN npx prisma generate
-
 # app code changes all the time
 ADD . .
 RUN npm run build
