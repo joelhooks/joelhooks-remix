@@ -1,73 +1,9 @@
 import * as React from 'react'
 import type {HeadersFunction, LinkProps} from 'remix'
 import {Link} from 'remix'
-import type {NonNullProperties, User} from '~/types'
-import {Team} from '@prisma/client'
+import type {NonNullProperties} from '~/types'
 import * as dateFns from 'date-fns'
-import md5 from 'md5-hash'
-import {images} from '../images'
 import type {getEnv} from './env.server'
-
-const teams: Array<Team> = Object.values(Team)
-const isTeam = (team?: string): team is Team => teams.includes(team as Team)
-const unknownTeam = {UNKNOWN: 'UNKNOWN'} as const
-const optionalTeams = {...Team, ...unknownTeam}
-type OptionalTeam = typeof optionalTeams[keyof typeof optionalTeams]
-
-const defaultAvatarSize = 128
-
-function getAvatar(
-  email: string,
-  {
-    size = defaultAvatarSize,
-    fallback = images.kodyProfileWhite({resize: {width: size}}),
-    origin,
-  }: {size?: number; fallback?: string | null; origin?: string} = {},
-) {
-  const hash = md5(email)
-  const url = new URL(`https://www.gravatar.com/avatar/${hash}`)
-  url.searchParams.set('size', String(size))
-  if (fallback) {
-    if (origin && fallback.startsWith('/')) {
-      fallback = `${origin}${fallback}`
-    }
-    url.searchParams.set('default', fallback)
-  }
-  return url.toString()
-}
-
-const avatarFallbacks: Record<Team, (width: number) => string> = {
-  BLUE: (width: number) => images.kodyProfileBlue({resize: {width}}),
-  RED: (width: number) => images.kodyProfileRed({resize: {width}}),
-  YELLOW: (width: number) => images.kodyProfileYellow({resize: {width}}),
-}
-
-function getAvatarForUser(
-  {email, team, firstName}: Pick<User, 'email' | 'team' | 'firstName'>,
-  {size = defaultAvatarSize, origin}: {size?: number; origin?: string} = {},
-) {
-  return {
-    src: getAvatar(email, {
-      fallback: avatarFallbacks[team](size),
-      size,
-      origin,
-    }),
-    alt: firstName,
-  }
-}
-
-const teamTextColorClasses: Record<OptionalTeam, string> = {
-  YELLOW: 'text-team-yellow',
-  BLUE: 'text-team-blue',
-  RED: 'text-team-red',
-  UNKNOWN: 'text-team-unknown',
-}
-
-const teamDisplay: Record<Team, string> = {
-  RED: 'Red',
-  BLUE: 'Blue',
-  YELLOW: 'Yellow',
-}
 
 const useSSRLayoutEffect =
   typeof window === 'undefined' ? () => {} : React.useLayoutEffect
@@ -360,8 +296,6 @@ function useDoubleCheck() {
 }
 
 export {
-  getAvatar,
-  getAvatarForUser,
   AnchorOrLink,
   getErrorMessage,
   getErrorStack,
@@ -381,11 +315,6 @@ export {
   toBase64,
   removeTrailingSlash,
   reuseUsefulLoaderHeaders,
-  unknownTeam,
-  teams,
-  isTeam,
-  teamDisplay,
-  teamTextColorClasses,
   formatDate,
   formatTime,
   formatNumber,
