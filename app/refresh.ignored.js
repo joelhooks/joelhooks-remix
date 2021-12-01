@@ -1,1 +1,1 @@
-// 1638339053328: /Users/joel/Code/joelhooks/joelhooks-remix/content/blog/export-drip-tags-for-convertkit/index.mdx
+// 1638339290824: /Users/joel/Code/joelhooks/joelhooks-remix/content/blog/tummler/index.mdx
