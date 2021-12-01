@@ -1,1 +1,1 @@
-// 1638328071983: /Users/joel/Code/joelhooks/joelhooks-remix/content/legacy_blog/2013-06-06-my-sketchnotes-and-thoughts-from-baconbizconf-2013.mdx
+// 1638333687130: /Users/joel/Code/joelhooks/joelhooks-remix/content/blog/zsh-setup/index.mdx
