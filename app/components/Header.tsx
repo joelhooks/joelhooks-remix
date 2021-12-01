@@ -57,7 +57,7 @@ const Header = ({siteTitle}) => {
                 },
               })}
             >
-              {siteTitle}
+              your friend Joel's digital garden
             </span>
           </a>
           <div

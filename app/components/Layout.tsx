@@ -176,7 +176,7 @@ const Layout = ({
         `}
       />
       <div className="flex flex-col w-full min-h-screen">
-        <Header siteTitle="Joel Blog" />
+        <Header siteTitle="Joel's Blog" />
         <Fragment>{children}</Fragment>
         {noFooter || <Footer author="Joel Hooks" />}
       </div>
