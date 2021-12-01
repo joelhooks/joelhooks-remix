@@ -2,6 +2,7 @@ import nodePath from 'path'
 import {Octokit as createOctokit} from '@octokit/rest'
 import {throttling} from '@octokit/plugin-throttling'
 import type {GitHubFile} from '~/types'
+import {getRequiredGlobalEnvVar} from '~/utils/misc'
 
 const Octokit = createOctokit.plugin(throttling)
 
@@ -131,8 +132,8 @@ async function downloadFileBySha(sha: string) {
   const {data} = await octokit.request(
     'GET /repos/{owner}/{repo}/git/blobs/{file_sha}',
     {
-      owner: 'joelhooks',
-      repo: 'joelhooks-remix',
+      owner: getRequiredGlobalEnvVar('GITHUB_ARTICLES_ACCOUNT'),
+      repo: getRequiredGlobalEnvVar('GITHUB_ARTICLES_REPO'),
       file_sha: sha,
     },
   )
@@ -145,8 +146,8 @@ async function downloadFile(path: string) {
   const {data} = (await octokit.request(
     'GET /repos/{owner}/{repo}/contents/{path}',
     {
-      owner: 'joelhooks',
-      repo: 'joelhooks-remix',
+      owner: getRequiredGlobalEnvVar('GITHUB_ARTICLES_ACCOUNT'),
+      repo: getRequiredGlobalEnvVar('GITHUB_ARTICLES_REPO'),
       path,
     },
   )) as {data: {content?: string; encoding?: string}}
@@ -170,8 +171,8 @@ async function downloadFile(path: string) {
  */
 async function downloadDirList(path: string) {
   const resp = await octokit.repos.getContent({
-    owner: 'joelhooks',
-    repo: 'joelhooks-remix',
+    owner: getRequiredGlobalEnvVar('GITHUB_ARTICLES_ACCOUNT'),
+    repo: getRequiredGlobalEnvVar('GITHUB_ARTICLES_REPO'),
     path,
   })
   const data = resp.data
