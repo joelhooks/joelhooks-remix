@@ -1,1 +1,1 @@
-// 1638333687130: /Users/joel/Code/joelhooks/joelhooks-remix/content/blog/zsh-setup/index.mdx
+// 1638339053328: /Users/joel/Code/joelhooks/joelhooks-remix/content/blog/export-drip-tags-for-convertkit/index.mdx
