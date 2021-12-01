@@ -11,11 +11,10 @@ import {fonts} from '~/lib/typography'
 import config from '../config'
 import Footer from '~/components/Footer'
 
-const Layout = ({
-  site = {siteMetaData: {}},
+const Layout: React.FC<{frontmatter?: any; noFooter?: boolean}> = ({
   frontmatter = {},
   children,
-  noFooter,
+  noFooter = false,
 }) => {
   return (
     <Fragment>

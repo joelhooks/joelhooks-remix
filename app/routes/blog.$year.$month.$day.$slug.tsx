@@ -1,18 +1,14 @@
+/** @jsx jsx */
 import * as React from 'react'
 import type {MetaFunction, LoaderFunction} from 'remix'
 import {useLoaderData, json, Link, useParams} from 'remix'
-import type {
-  CachifiedOptions,
-  KCDLoader,
-  MDXPage,
-  MdxPage,
-  Timings,
-} from '~/types'
-import {getMdxPage, useMdxComponent} from '~/utils/mdx'
-import {css} from '@emotion/react'
+import type {KCDLoader, MdxPage} from '~/types'
+import {getMdxPage, mdxPageMeta, useMdxComponent} from '~/utils/mdx'
+import {css, jsx} from '@emotion/react'
 import {bpMinMD} from '~/lib/breakpoints'
 import Container from '~/components/Container'
 import Layout from '~/components/Layout'
+import type {Timings} from '~/utils/metrics.server'
 
 type CatchData = {}
 
@@ -20,7 +16,12 @@ type LoaderData = CatchData & {
   page: MdxPage
 }
 
-export const loader: KCDLoader<{slug: string}> = async ({request, params}) => {
+export const loader: KCDLoader<{
+  slug: string
+  year: string
+  month: string
+  day: string
+}> = async ({request, params}) => {
   const timings: Timings = {}
   const page = await getMdxPage(
     {
@@ -32,6 +33,8 @@ export const loader: KCDLoader<{slug: string}> = async ({request, params}) => {
 
   return json({page})
 }
+
+export const meta = mdxPageMeta
 
 export default function Blog() {
   const data = useLoaderData<LoaderData>()
@@ -56,6 +59,19 @@ export default function Blog() {
         })}
       >
         <Container>
+          <h1
+            css={css({
+              textAlign: 'center',
+              margin: '0 0 30px 0',
+              [bpMinMD]: {
+                margin: '0 0 50px 0',
+                fontSize: '3rem',
+              },
+              fontSize: '1.75rem',
+            })}
+          >
+            {frontmatter.title}
+          </h1>
           <Component />
         </Container>
       </article>

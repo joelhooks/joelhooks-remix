@@ -13,7 +13,6 @@ type ENV = ReturnType<typeof getEnv>
 declare global {
   // eslint-disable-next-line
   var ENV: ENV
-
   interface Window {
     ENV: ENV
   }

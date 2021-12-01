@@ -42,6 +42,7 @@
     "esbuild": "^0.14.0",
     "express-http-proxy": "^1.6.3",
     "hast-util-to-string": "^2.0.0",
+    "lodash": "^4.17.21",
     "lru-cache": "^6.0.0",
     "md5-hash": "^1.0.1",
     "mdx-bundler": "^8.0.0",
@@ -83,6 +84,7 @@
   "devDependencies": {
     "@remix-run/dev": "^1.0.6",
     "@tailwindcss/line-clamp": "^0.2.2",
+    "@types/lodash": "^4.14.177",
     "@types/lru-cache": "^5.1.1",
     "@types/react": "^17.0.24",
     "@types/react-dom": "^17.0.9",

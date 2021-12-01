@@ -132,7 +132,6 @@ async function getMdxDirList(contentDir: string, options?: CachifiedOptions) {
         }))
         .filter(({name}) => name !== 'README.md')
 
-      consol.log({dirList})
       return dirList
     },
   })
@@ -332,20 +331,20 @@ function mdxPageMeta({
         description: data.page.frontmatter.description,
         keywords: keywords.join(', '),
         url: getUrl(requestInfo),
-        image: getSocialImageWithPreTitle({
-          origin: requestInfo.origin,
-          url: getDisplayUrl(requestInfo),
-          featuredImage:
-            data.page.frontmatter.bannerCloudinaryId ??
-            'kentcdodds.com/illustrations/kody-flying_blue',
-          title:
-            data.page.frontmatter.socialImageTitle ??
-            data.page.frontmatter.title ??
-            'Untitled',
-          preTitle:
-            data.page.frontmatter.socialImagePreTitle ??
-            `Checkout this article`,
-        }),
+        // image: getSocialImageWithPreTitle({
+        //   origin: requestInfo.origin,
+        //   url: getDisplayUrl(requestInfo),
+        //   featuredImage:
+        //     data.page.frontmatter.bannerCloudinaryId ??
+        //     'kentcdodds.com/illustrations/kody-flying_blue',
+        //   title:
+        //     data.page.frontmatter.socialImageTitle ??
+        //     data.page.frontmatter.title ??
+        //     'Untitled',
+        //   preTitle:
+        //     data.page.frontmatter.socialImagePreTitle ??
+        //     `Checkout this article`,
+        // }),
       }),
       ...extraMeta,
     }
@@ -367,10 +366,10 @@ function mapFromMdxPageToMdxListItem(page: MdxPage): MdxListItem {
 }
 
 const mdxComponents = {
-  h1: (props) => <Title {...props} />,
-  h2: (props) => <Subtitle {...props} />,
-  p: (props) => <Paragraph {...props} />,
-  pre: (preProps) => {
+  h1: (props: any) => <Title {...props} />,
+  h2: (props: any) => <Subtitle {...props} />,
+  p: (props: any) => <Paragraph {...props} />,
+  pre: (preProps: any) => {
     const props = preToCodeBlock(preProps)
     // if there's a codeString and some props, we passed the test
     if (props) {
@@ -397,7 +396,6 @@ function getMdxComponent(code: string) {
     ...rest
   }: Parameters<typeof Component>['0']) {
     return (
-      // @ts-expect-error the types are wrong here
       <Component components={{...mdxComponents, ...components}} {...rest} />
     )
   }

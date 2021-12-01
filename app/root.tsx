@@ -1,8 +1,12 @@
+import * as React from 'react'
 import {
+  json,
   Link,
   Links,
   LiveReload,
+  LoaderFunction,
   Meta,
+  MetaFunction,
   Outlet,
   Scripts,
   ScrollRestoration,
@@ -14,25 +18,85 @@ import vendorStyles from './styles/vendors.css'
 import appStyles from './styles/app.css'
 import proseStyles from './styles/prose.css'
 import noScriptStyles from './styles/no-script.css'
-import {illustrationImages} from '~/images'
 import {getEnv} from '~/utils/env.server'
-import type {Await} from '../types'
-import {User} from '@prisma/client'
-import {TypographyStyle, GoogleFont} from 'react-typography'
+import type {Await, KCDHandle} from '../types'
+import {TypographyStyle} from 'react-typography'
 import typography from '~/lib/typography'
+import type {Timings} from '~/utils/metrics.server'
+import {getServerTimeHeader, time} from '~/utils/metrics.server'
+import {getDomainUrl, getUrl} from '~/utils/misc'
+import {pathedRoutes} from '~/other-routes.server'
+import {getSocialMetas} from '~/utils/seo'
+
+export const handle: KCDHandle & {id: string} = {
+  id: 'root',
+}
+
+export const meta: MetaFunction = ({data}) => {
+  const requestInfo = (data as LoaderData | undefined)?.requestInfo
+  const title = "Joel's digital garden"
+  const description = 'Ramblings of a software developer'
+  return {
+    viewport: 'width=device-width,initial-scale=1,viewport-fit=cover',
+    'theme-color': '#A9ADC1',
+    ...getSocialMetas({
+      origin: requestInfo?.origin ?? '',
+      keywords: '',
+      url: getUrl(requestInfo),
+      // image: getGenericSocialImage({
+      //   origin: requestInfo?.origin ?? '',
+      //   url: getDisplayUrl(requestInfo),
+      //   words:
+      //     'Helping people make the world a better place through quality software.',
+      //   featuredImage: 'kentcdodds.com/illustrations/kody-flying_blue',
+      // }),
+      title,
+      description,
+    }),
+  }
+}
+
+export const loader: LoaderFunction = async ({request}) => {
+  // because this is called for every route, we'll do an early return for anything
+  // that has a other route setup. The response will be handled there.
+  if (pathedRoutes[new URL(request.url).pathname]) {
+    return new Response()
+  }
+
+  const timings: Timings = {}
+  // const session = await getSession(request)
+  // const themeSession = await getThemeSession(request)
+  // const clientSession = await getClientSession(request)
+  // const loginInfoSession = await getLoginInfoSession(request)
+
+  const data: LoaderData = {
+    ENV: getEnv(),
+    requestInfo: {
+      origin: getDomainUrl(request),
+      path: new URL(request.url).pathname,
+    },
+  }
+  const headers: HeadersInit = new Headers()
+  headers.append('Server-Timing', getServerTimeHeader(timings))
+  // this can lead to race conditions if a child route is also trying to commit
+  // the cookie as well. This is a bug in remix that will hopefully be fixed.
+  // we reduce the likelihood of a problem by only committing if the value is
+  // different.
+  // await session.getHeaders(headers)
+  // await clientSession.getHeaders(headers)
+  // await loginInfoSession.getHeaders(headers)
+
+  return json(data, {headers})
+}
 
 export type LoaderData = {
-  user: User | null
-  userInfo: Await<ReturnType<typeof getUserInfo>> | null
   ENV: ReturnType<typeof getEnv>
-  randomFooterImageKey: keyof typeof illustrationImages
   requestInfo: {
     origin: string
     path: string
-    session: {
+    session?: {
       email: string | undefined
       magicLinkVerified: boolean | undefined
-      theme: Theme | null
     }
   }
 }
