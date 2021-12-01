@@ -1,13 +1,7 @@
 import * as React from 'react'
 import type {MetaFunction, LoaderFunction} from 'remix'
 import {useLoaderData, json, Link, useParams} from 'remix'
-import type {
-  CachifiedOptions,
-  KCDLoader,
-  MDXPage,
-  MdxPage,
-  Timings,
-} from '~/types'
+import type {KCDLoader, MdxPage, Timings} from '~/types'
 import {getMdxPage, useMdxComponent} from '~/utils/mdx'
 
 type CatchData = {}

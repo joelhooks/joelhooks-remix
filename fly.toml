@@ -1,20 +1,17 @@
-app = "wild-dew-6888"
+# fly.toml file generated for falling-cloud-6728 on 2021-11-30T15:37:24-08:00
+
+app = "falling-cloud-6728"
 
 kill_signal = "SIGINT"
 kill_timeout = 5
 
 [env]
-  PORT = "8080"
   CYPRESS_INSTALL_BINARY = "0"
+  FLY = "true"
   HUSKY_SKIP_INSTALL = "1"
   NODE_ENV = "production"
-  FLY = "true"
-  PRIMARY_REGION = "dfw"
-
-# [deploy]
-#  release_command = "npx prisma migrate deploy"
-
-# IDEA: add back statics config here (fa0fbe9)
+  PORT = "8080"
+  PRIMARY_REGION = "sea"
 
 [experimental]
   allowed_public_ports = []
@@ -43,13 +40,3 @@ kill_timeout = 5
     interval = "15s"
     restart_limit = 6
     timeout = "2s"
-
-#   [[services.http_checks]]
-#     interval = 10000
-#     grace_period = "5s"
-#     method = "get"
-#     path = "/healthcheck"
-#     protocol = "http"
-#     timeout = 2000
-#     tls_skip_verify = false
-#     [services.http_checks.headers]
