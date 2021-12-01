@@ -26,19 +26,21 @@ export const loader: KCDLoader<{slug: string}> = async ({request, params}) => {
     {request, timings},
   )
 
-  console.log({page})
-
-  return json({})
+  return json({page})
 }
 
 export default function Blog() {
   const data = useLoaderData<LoaderData>()
   const params = useParams()
 
-  // const {code, frontmatter} = data.page
+  const {code, frontmatter} = data.page
 
-  // const Component = useMdxComponent(code)
+  const Component = useMdxComponent(code)
 
   console.log(params, data)
-  return <div>{/*<Component />*/}</div>
+  return (
+    <div>
+      <Component />
+    </div>
+  )
 }

@@ -75,6 +75,8 @@ async function downloadMdxFileOrDirectory(
   let files: Array<GitHubFile> = []
   let entry = mdxFileOrDirectory
 
+  console.log({content})
+
   if (content) {
     // technically you can get the blog post by adding .mdx at the end... Weird
     // but may as well handle it since that's easy...

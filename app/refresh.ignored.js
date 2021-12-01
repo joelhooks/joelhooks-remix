@@ -1,1 +1,1 @@
-// 1638310036347: /Users/joel/Code/joelhooks/joelhooks-remix/content/blog/zhs-setup/index.mdx
+// 1638321743089: /Users/joel/Code/joelhooks/joelhooks-remix/content/legacy_blog/2013-06-22-optimizing-a-photography-studio-website-for-converstion-and-seo-the-analysis.mdx
