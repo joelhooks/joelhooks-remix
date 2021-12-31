@@ -4,6 +4,8 @@ function getEnv() {
     NODE_ENV: process.env.NODE_ENV,
     DISCORD_CLIENT_ID: process.env.DISCORD_CLIENT_ID,
     PRIMARY_REGION: process.env.PRIMARY_REGION,
+    GITHUB_ARTICLES_ACCOUNT: process.env.GITHUB_ARTICLES_ACCOUNT,
+    GITHUB_ARTICLES_REPO: process.env.GITHUB_ARTICLES_REPO,
   }
 }
 

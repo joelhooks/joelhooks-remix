@@ -1,15 +1,22 @@
 /** @jsx jsx */
 import * as React from 'react'
 import type {MetaFunction, LoaderFunction} from 'remix'
-import {useLoaderData, json, Link, useParams} from 'remix'
-import type {KCDLoader, MdxPage} from '~/types'
-import {getMdxPage, mdxPageMeta, useMdxComponent} from '~/utils/mdx'
+import {useLoaderData, json, Link, useParams, HeadersFunction} from 'remix'
+import type {KCDHandle, KCDLoader, MdxPage} from '~/types'
+import {
+  getMdxPage,
+  getMdxPagesInDirectory,
+  mdxPageMeta,
+  useMdxComponent,
+} from '~/utils/mdx'
 import {css, jsx} from '@emotion/react'
 import {bpMaxSM, bpMinMD, bpMinLG} from '~/lib/breakpoints'
 import Container from '~/components/Container'
 import Layout from '~/components/Layout'
 import type {Timings} from '~/utils/metrics.server'
 import {useRootData} from '~/utils/use-root-data'
+import {pathedRoutes} from '~/other-routes.server'
+import {reuseUsefulLoaderHeaders} from '~/utils/misc'
 
 type CatchData = {}
 
@@ -17,7 +24,29 @@ type LoaderData = CatchData & {
   page: MdxPage
 }
 
+export const handle: KCDHandle = {
+  getSitemapEntries: async (request) => {
+    const pages = await getMdxPagesInDirectory('pages', {request})
+    return pages
+      .filter((page) => !page.frontmatter.draft)
+      .map((page) => {
+        return {route: `/${page.slug}`, priority: 0.6}
+      })
+  },
+}
+
 export const loader: KCDLoader<{slug: string}> = async ({request, params}) => {
+  console.log(
+    new URL(request.url).pathname,
+    pathedRoutes,
+    pathedRoutes[new URL(request.url).pathname],
+  )
+
+  if (pathedRoutes[new URL(request.url).pathname]) {
+    console.log('WHY NO HERE')
+    return new Response()
+  }
+
   const timings: Timings = {}
   const page = await getMdxPage(
     {
@@ -27,10 +56,17 @@ export const loader: KCDLoader<{slug: string}> = async ({request, params}) => {
     {request, timings},
   )
 
-  return json({page})
+  const headers = {
+    'Cache-Control': 'private, max-age=3600',
+    Vary: 'Cookie',
+  }
+
+  return json({page}, {status: 200, headers})
 }
 
 export const meta = mdxPageMeta
+
+export const headers: HeadersFunction = reuseUsefulLoaderHeaders
 
 export default function Blog() {
   const data = useLoaderData<LoaderData>()

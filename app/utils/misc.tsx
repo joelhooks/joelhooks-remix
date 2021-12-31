@@ -321,4 +321,3 @@ export {
   formatAbbreviatedNumber,
 }
 export {listify} from './listify'
-export type {OptionalTeam}

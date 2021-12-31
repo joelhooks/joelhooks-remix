@@ -2,7 +2,7 @@
 // put it in its own file which is silly I know...
 
 import {useMatchLoaderData} from './providers'
-import type {LoaderData} from '../root'
-import {handle} from '../root'
+import type {LoaderData} from '~/root'
+import {handle} from '~/root'
 
 export const useRootData = () => useMatchLoaderData<LoaderData>(handle.id)

@@ -120,6 +120,7 @@ async function downloadDirectory(dir: string): Promise<Array<GitHubFile>> {
     return result.flat()
   } catch (e) {
     console.error(e)
+    return Promise.reject(e)
   }
 }
 
