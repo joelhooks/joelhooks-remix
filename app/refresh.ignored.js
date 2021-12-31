@@ -1,1 +1,1 @@
-// 1640983108181: /Users/joel/Code/joelhooks/joelhooks-remix/content/blog/automation/index.mdx
+// 1640983248896: /Users/joel/Code/joelhooks/joelhooks-remix/content/blog/marketing-automation/index.mdx
