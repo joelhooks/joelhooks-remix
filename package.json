@@ -25,9 +25,9 @@
     "@octokit/rest": "^18.12.0",
     "@remark-embedder/core": "^2.0.0",
     "@remark-embedder/transformer-oembed": "^2.0.0",
-    "@remix-run/express": "1.0.6",
-    "@remix-run/react": "^1.0.6",
-    "@remix-run/serve": "^1.0.6",
+    "@remix-run/express": "1.1.1",
+    "@remix-run/react": "^1.1.1",
+    "@remix-run/serve": "^1.1.1",
     "@sentry/node": "^6.15.0",
     "@sentry/tracing": "^6.15.0",
     "@tailwindcss/aspect-ratio": "^0.3.0",
@@ -80,7 +80,7 @@
     "unist-util-visit": "^4.1.0"
   },
   "devDependencies": {
-    "@remix-run/dev": "^1.0.6",
+    "@remix-run/dev": "^1.1.1",
     "@tailwindcss/line-clamp": "^0.2.2",
     "@types/lodash": "^4.14.177",
     "@types/lru-cache": "^5.1.1",
