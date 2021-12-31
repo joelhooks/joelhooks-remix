@@ -16,14 +16,14 @@ installGlobals()
 
 const here = (...d: Array<string>) => path.join(__dirname, ...d)
 
-if (process.env.FLY) {
-  Sentry.init({
-    dsn: process.env.SENTRY_DSN,
-    tracesSampleRate: 0.3,
-    environment: process.env.NODE_ENV,
-  })
-  Sentry.setContext('region', {name: process.env.FLY_REGION ?? 'unknown'})
-}
+// if (process.env.FLY) {
+//   Sentry.init({
+//     dsn: process.env.SENTRY_DSN,
+//     tracesSampleRate: 0.3,
+//     environment: process.env.NODE_ENV,
+//   })
+//   Sentry.setContext('region', {name: process.env.FLY_REGION ?? 'unknown'})
+// }
 
 const MODE = process.env.NODE_ENV
 const BUILD_DIR = path.join(process.cwd(), 'build')
