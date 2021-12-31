@@ -1,1 +1,1 @@
-// 1640982567289: /Users/joel/Code/joelhooks/joelhooks-remix/content/blog/email-marketing-brennan-dunn/index.mdx
+// 1640983108181: /Users/joel/Code/joelhooks/joelhooks-remix/content/blog/automation/index.mdx
