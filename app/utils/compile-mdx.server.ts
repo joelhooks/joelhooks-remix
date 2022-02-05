@@ -106,7 +106,7 @@ const eggheadTransformer = {
 
     // Kent's affiliate link
     if (!searchParams.has('af')) {
-      searchParams.set('af', '5236ad')
+      searchParams.set('af', '1njoh8')
     }
 
     const iframeSrc = `https://${host}${pathname}/embed?${searchParams.toString()}`
@@ -125,14 +125,14 @@ function autoAffiliates() {
       if (linkNode.url.includes('amazon.com')) {
         const amazonUrl = new URL(linkNode.url)
         if (!amazonUrl.searchParams.has('tag')) {
-          amazonUrl.searchParams.set('tag', 'kentcdodds-20')
+          amazonUrl.searchParams.set('tag', 'joehoobuiblo-20')
           linkNode.url = amazonUrl.toString()
         }
       }
       if (linkNode.url.includes('egghead.io')) {
         const eggheadUrl = new URL(linkNode.url)
         if (!eggheadUrl.searchParams.has('af')) {
-          eggheadUrl.searchParams.set('af', '5236ad')
+          eggheadUrl.searchParams.set('af', '1njoh8')
           linkNode.url = eggheadUrl.toString()
         }
       }
